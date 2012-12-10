@@ -127,7 +127,7 @@ namespace AtomicAltTabl
 		/// </summary>
 		private void HandleHotkey()
 		{
-			SetTextBoxTipText(UsageTipKeyCombination);
+			SetTextBoxTipText();
 			this.Visible = true;
 			this._textboxProcessInput.Focus();
 			this.Activate();
