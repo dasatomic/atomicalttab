@@ -209,79 +209,76 @@ namespace AtomicAltTabl
 		/// <param name="e"></param>
 		private void TextboxProcessInputTextChanged(object sender, KeyEventArgs e)
 		{
-			lock (this.lockObject)
+			if (textBoxShowsTip)
 			{
-				if (textBoxShowsTip)
+				this._textboxProcessInput.Text = string.Empty;
+				textBoxShowsTip = false;
+			}
+			else if (string.IsNullOrEmpty(_textboxProcessInput.Text))
+			{
+				// We don't have anything to show, hide the active process form.
+				//
+				activeProcessForm.Visible = false;
+			}
+			else
+			{
+				if (e.KeyCode == Keys.Down || (e.KeyCode == Keys.S && e.Modifiers == Keys.Alt))
 				{
-					this._textboxProcessInput.Text = string.Empty;
-					textBoxShowsTip = false;
-				}
-				else if (string.IsNullOrEmpty(_textboxProcessInput.Text))
-				{
-					// We don't have anything to show, hide the active process form.
+					// We increment selected item in the grid.
 					//
-					activeProcessForm.Visible = false;
+					activeProcessForm.ClearSelected();
+					activeProcessForm.IncrementSelected();
+
+					// Put the currently selected window to the from but keep the focus on the AtomicAltTab.
+					//
+					activeProcessForm.FocusSelected();
+					this.Visible = true;
+					this._textboxProcessInput.Focus();
+					this.Activate();
+					activeProcessForm.Activate();
+					activeProcessForm.Focus();
+					this.Focus();
 				}
-				else
+				else if (e.KeyCode == Keys.Up || (e.KeyCode == Keys.W && e.Modifiers == Keys.Alt))
 				{
-					if (e.KeyCode == Keys.Down || (e.KeyCode == Keys.S && e.Modifiers == Keys.Alt))
-					{
-						// We increment selected item in the grid.
-						//
-						activeProcessForm.ClearSelected();
-						activeProcessForm.IncrementSelected();
+					// We decrement selected item in the grid.
+					//
+					activeProcessForm.ClearSelected();
+					activeProcessForm.DecrementSelected();
 
-						// Put the currently selected window to the from but keep the focus on the AtomicAltTab.
-						//
-						activeProcessForm.FocusSelected();
-						this.Visible = true;
-						this._textboxProcessInput.Focus();
-						this.Activate();
-						activeProcessForm.Activate();
-						activeProcessForm.Focus();
-						this.Focus();
-					}
-					else if (e.KeyCode == Keys.Up || (e.KeyCode == Keys.W && e.Modifiers == Keys.Alt))
-					{
-						// We decrement selected item in the grid.
-						//
-						activeProcessForm.ClearSelected();
-						activeProcessForm.DecrementSelected();
+					// Put the currently selected window to the from but keep the focus on the AtomicAltTab.
+					//
+					activeProcessForm.FocusSelected();
+					this.Visible = true;
+					this._textboxProcessInput.Focus();
+					this.Activate();
+					activeProcessForm.Activate();
+					activeProcessForm.Focus();
+					this.Focus();
+				}
+				else if (e.KeyCode == Keys.Enter)
+				{
+					// Put selected window to the focus and hide the AtomicAltTab form.
+					//
+					activeProcessForm.FocusSelected();
 
-						// Put the currently selected window to the from but keep the focus on the AtomicAltTab.
-						//
-						activeProcessForm.FocusSelected();
-						this.Visible = true;
-						this._textboxProcessInput.Focus();
-						this.Activate();
-						activeProcessForm.Activate();
-						activeProcessForm.Focus();
-						this.Focus();
-					}
-					else if (e.KeyCode == Keys.Enter)
-					{
-						// Put selected window to the focus and hide the AtomicAltTab form.
-						//
-						activeProcessForm.FocusSelected();
+					activeProcessForm.Visible = false;
+					this.Visible = false;
+				}
+				else if (e.KeyCode == Keys.C && e.Modifiers == Keys.Alt)
+				{
+					// Close the selected window.
+					//
+					activeProcessForm.CloseSelectedWindow();
+					activeProcessForm.ClearSelected();
 
-						activeProcessForm.Visible = false;
-						this.Visible = false;
-					}
-					else if (e.KeyCode == Keys.C && e.Modifiers == Keys.Alt)
-					{
-						// Close the selected window.
-						//
-						activeProcessForm.CloseSelectedWindow();
-						activeProcessForm.ClearSelected();
+					// Refresh the list.
+					//
+					windowManager.RefreshOpenWidnowsList();
+					windowManager.RefreshProcessList();
 
-						// Refresh the list.
-						//
-						windowManager.RefreshOpenWidnowsList();
-						windowManager.RefreshProcessList();
-
-						List<WindowDescriptor> windowDescriptors = windowManager.GetOpenWindows(_textboxProcessInput.Text);
-						activeProcessForm.RefreshList(windowDescriptors);
-					}
+					List<WindowDescriptor> windowDescriptors = windowManager.GetOpenWindows(_textboxProcessInput.Text);
+					activeProcessForm.RefreshList(windowDescriptors);
 				}
 			}
 		}
